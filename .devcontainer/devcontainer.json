@@ -6,7 +6,7 @@
   //"runArgs": ["--privileged"],
   "workspaceMount": "source=${localWorkspaceFolder},target=/workspace/app,type=bind",
   "workspaceFolder": "/workspace",
-  "postCreateCommand": "west init -l app/ && west update --narrow -o=--depth=1 && west zephyr-export && pip install -r deps/zephyr/scripts/requirements-base.txt",
+  "postCreateCommand": "west init -l app/ && west update --narrow -o=--depth=1 && west zephyr-export && pip install -r deps/zephyr/scripts/requirements-base.txt && pip install click cryptography cbor",
   "mounts": [
     "source=${localWorkspaceFolder}/.vscode/,target=/workspace/.vscode,type=bind,consistency=cached",
     "source=zephyr-toolchains,target=/opt/toolchains,type=volume,consistency=delegated",
