@@ -1,0 +1,67 @@
+name: Build binary
+
+on:
+  workflow_dispatch:
+    inputs:
+      ZEPHYR_SDK:
+        description: "Zephyr SDK version. Ex. 0.16.8."
+        required: true
+        type: string
+        default: 0.16.8
+      BOARD:
+        description: "Target board."
+        required: true
+        type: string
+        default: nucleo_f401re
+
+  workflow_call:
+    inputs:
+      ZEPHYR_SDK:
+        required: true
+        type: string
+      BOARD:
+        required: true
+        type: string
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    container: ghcr.io/silvio-vallorani-zephyr-portfolio/zephyr_container:arm-${{ inputs.ZEPHYR_SDK }}SDK
+
+    env:
+      ZEPHYR_SDK_INSTALL_DIR: /opt/toolchains/zephyr-sdk-${{ inputs.ZEPHYR_SDK }}
+
+    steps:
+      - name: Setup West workspace
+        run: |
+          west init -m https://github.com/$GITHUB_REPOSITORY .
+          west update --narrow -o=--depth=1
+          west zephyr-export
+          pip3 install -r deps/zephyr/scripts/requirements-base.txt
+
+      - name: Build with West
+        run: |
+          west build -p -b ${{ inputs.BOARD }} app/
+
+      - name: Create filename prefix
+        run: echo "PREFIX=${{ github.event.repository.name }}-${{ inputs.BOARD }}" >> "$GITHUB_ENV"
+
+      - name: Generate short SHA
+        uses: benjlevesque/short-sha@v2.2
+
+      - name: Prepare artifacts
+        run: |
+          cd build/zephyr
+          mkdir -p artifacts
+          mv zephyr.bin ./artifacts/${{ env.PREFIX }}-${{ env.SHA }}.bin
+          mv zephyr.elf ./artifacts/${{ env.PREFIX }}-${{ env.SHA }}.elf
+          mv zephyr.hex ./artifacts/${{ env.PREFIX }}-${{ env.SHA }}.hex
+
+      # Run IDs are unique per repo but are reused on re-runs
+      - name: Save artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: build_artifacts_${{ github.run_id }}
+          path: |
+            build/zephyr/artifacts/*
