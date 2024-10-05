@@ -1,0 +1,14 @@
+// & 'C:\Program Files\SEGGER\JLink\JLink.exe' -CommandFile prog_erase_stm32f401re.jlink
+// \opt\SEGGER\JLink\JLinkExe -CommandFile prog_erase_stm32f401re.jlink
+si swd
+speed 1000
+device STM32F401RE
+
+sleep 250
+erase
+
+sleep 250
+r
+h
+g
+exit

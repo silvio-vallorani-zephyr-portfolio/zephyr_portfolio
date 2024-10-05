@@ -1,0 +1,143 @@
+/*
+ * Copyright (c) 2023 Martin Jäger / Libre Solar
+ *
+ * SPDX-License-Identifier: Apache-2.0
+ */
+
+ #include <zephyr/dt-bindings/led/led.h>
+
+ / {
+	chosen {
+		zephyr,settings-partition = &storage_partition;
+	};
+
+	aliases {
+		retention-data = &retention0;
+		led-strip = &led_strip;
+		temp-hum-sensor = &temp_hum_sensor;
+		dbg-pin0 = &dbg_pin0;
+		dbg-pin1 = &dbg_pin1;
+	};
+
+	sram@20017C00 {
+		compatible = "zephyr,memory-region", "mmio-sram";
+		reg = <0x20017C00 DT_SIZE_K(1)>;
+		zephyr,memory-region = "RetainedMem";
+		status = "okay";
+		
+		retainedmem {
+			compatible = "zephyr,retained-ram";
+			status = "okay";
+			#address-cells = <1>;
+			#size-cells = <1>;
+
+			retention0: retention@0 {
+				compatible = "zephyr,retention";
+				status = "okay";
+				reg = <0x0 0x400>;
+				prefix = [de ad be ef];
+				checksum = <1>;
+			};
+		};
+	};
+
+	dbg_pins: dbg_pins {
+		compatible = "debug-pins";
+		dbg_pin0: dbg_pin_0 {
+			gpios = <&gpioc 10 GPIO_ACTIVE_HIGH>;
+			label = "Debug PIn 0";
+		};
+		dbg_pin1: dbg_pin_1 {
+			gpios = <&gpioc 11 GPIO_ACTIVE_HIGH>;
+			label = "Debug PIn 1";
+		};
+	};
+
+	temp_hum_sensor: dht110 {
+		compatible = "aosong,dht";
+		status = "okay";
+		dio-gpios = <&gpioc 12 (GPIO_PULL_UP | GPIO_ACTIVE_LOW)>;
+	};
+};
+
+// Reduce the sram0 size by the size of the retained memory
+&sram0 {
+	reg = <0x20000000 DT_SIZE_K(95)>;
+};
+
+/delete-node/ &boot_partition;
+/delete-node/ &slot0_partition;
+/delete-node/ &slot1_partition;
+/delete-node/ &scratch_partition;
+
+&flash0 {
+	partitions {
+
+		/*
+		 * Accordingly with zephyr/drivers/flash/flash_stm32f4x.c :
+		 * 
+		 * static const struct flash_pages_layout stm32f4_flash_layout[] = {
+		 * 	
+		 * 	 // RM0368, table 5: STM32F401xE
+		 * 	 // RM0383, table 4: STM32F411xE
+		 * 	 // RM0390, table 4: STM32F446xx
+		 * 
+		 * 	{.pages_count = 4, .pages_size = KB(16)},
+		 * 	{.pages_count = 1, .pages_size = KB(64)},
+		 * 	{.pages_count = 3, .pages_size = KB(128)},
+		 * };
+		*/
+
+		compatible = "fixed-partitions";
+		#address-cells = <1>;
+		#size-cells = <1>;
+		
+		boot_partition: partition@0 {
+			label = "mcuboot";
+			reg = <0x00000000 DT_SIZE_K(32)>;
+			read-only;
+		};
+		storage_partition: partition@8000 {
+			label = "storage";
+			reg = <0x00008000 DT_SIZE_K(32)>;
+		};
+
+		/*
+		 * The flash starting at offset 0x10000 and ending at
+		 * offset 0x1ffff is reserved for use by the application.
+		 * it is 1 page of 64KB
+		 */
+
+		slot0_partition: partition@20000 {
+			label = "image-0";
+			reg = <0x00020000 DT_SIZE_K(128)>;
+		};
+		slot1_partition: partition@40000 {
+			label = "image-1";
+			reg = <0x00040000 DT_SIZE_K(128)>;
+		};
+		scratch_partition: partition@60000 {
+			label = "image-scratch";
+			reg = <0x00060000 DT_SIZE_K(128)>;
+		};
+	};
+};
+
+&spi1 {
+	led_strip: ws2812@0 {
+		compatible = "worldsemi,ws2812-spi";
+
+		/* SPI */
+		reg = <0>; /* ignored, but necessary for SPI bindings */
+		spi-max-frequency = <4000000>;
+		frame-format = <32768>; /* SPI_FRAME_FORMAT_TI */
+
+		/* WS2812 */
+		chain-length = <3>; /* arbitrary; change at will */
+		spi-one-frame = <0x70>;
+		spi-zero-frame = <0x40>;
+		color-mapping = <LED_COLOR_ID_GREEN
+				 LED_COLOR_ID_RED
+				 LED_COLOR_ID_BLUE>;
+	};
+};

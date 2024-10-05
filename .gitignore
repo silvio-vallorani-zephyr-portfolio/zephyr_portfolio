@@ -50,3 +50,18 @@ modules.order
 Module.symvers
 Mkfile.old
 dkms.conf
+
+secrets
+
+# Dockerized folder
+build-slot0/*
+!build-slot0/dummy
+build-mcuboot/*
+!build-mcuboot/dummy
+build-slot1/*
+!build-slot1/dummy
+.vscode/*
+!.vscode/tasks.json
+
+# Local Only
+*.jdebug.user

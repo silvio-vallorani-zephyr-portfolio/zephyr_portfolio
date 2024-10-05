@@ -15,5 +15,9 @@ manifest:
         path-prefix: deps
         name-allowlist:
           - zephyr
+          - mbedtls
+          - mcuboot
           - cmsis
           - hal_stm32
+          - segger
+          - zcbor

@@ -1,0 +1,13 @@
+description: GPIO pin for debug purposes
+compatible: "debug-pins"
+
+child-binding:
+  description: The GPIO used for debug with logic analyzer.
+  properties:
+    gpios:
+      type: phandle-array
+      required: true
+    label:
+      type: string
+      description: |
+        The GPIO used for debug with logic analyzer.

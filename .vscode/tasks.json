@@ -1,63 +1,201 @@
 {
-  "version": "2.0.0",
-  "tasks": [
-    {
-      "label": "West Build",
-      "type": "shell",
-      "group": {
-        "kind": "build",
-        "isDefault": true
-      },
-      "command": "west",
-      "args": [
-        "build",
-        "-p",
-        "auto",
-        "-b",
-        "nucleo_f401re",
-        "app/"
-      ],
-      "problemMatcher": [
-        "$gcc"
-      ],
-    },
-    {
-      "label": "West Configurable Build",
-      "type": "shell",
-      "group": {
-        "kind": "build",
-      },
-      "command": "west",
-      "args": [
-        "build",
-        "-p",
-        "${input:pristine}",
-        "-b",
-        "${input:board}",
-        "app/"
-      ],
-      "problemMatcher": [
-        "$gcc"
-      ]
-    }
-  ],
-  "inputs": [
-    {
-      "id": "board",
-      "type": "promptString",
-      "default": "nucleo_f401re",
-      "description": "See https://docs.zephyrproject.org/latest/boards/index.html"
-    },
-    {
-      "id": "pristine",
-      "type": "pickString",
-      "description": "Choose when to run a pristine build",
-      "default": "auto",
-      "options": [
-        "auto",
-        "always",
-        "never"
-      ]
-    }
-  ]
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "West Build",
+            "type": "shell",
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            },
+            "command": "west",
+            "args": [
+                "build",
+                "-p",
+                "auto",
+                "-b",
+                "nucleo_f401re",
+                "app/",
+                "-d",
+                "build-slot0"
+            ],
+            "problemMatcher": [
+                "$gcc"
+            ]
+        },
+        {
+            "label": "West Configurable Build",
+            "type": "shell",
+            "group": {
+                "kind": "build",
+            },
+            "command": "west",
+            "args": [
+                "build",
+                "-p",
+                "${input:pristine}",
+                "-b",
+                "${input:board}",
+                "app/",
+                "-d",
+                "build-slot0"
+            ],
+            "problemMatcher": [
+                "$gcc"
+            ]
+        },
+        {
+            "label": "West Build and Generate CodeChecker files",
+            "type": "shell",
+            "group": {
+                "kind": "build",
+            },
+            "command": "west",
+            "args": [
+                "build",
+                "-p",
+                "auto",
+                "-b",
+                "nucleo_f401re",
+                "app/",
+                "-d",
+                "build-slot0",
+                "--",
+                "-DZEPHYR_SCA_VARIANT=codechecker"
+            ],
+            "problemMatcher": [
+                "$gcc"
+            ]
+        },
+        {
+            "label": "West Configurable Build and Generate CodeChecker files",
+            "type": "shell",
+            "group": {
+                "kind": "build",
+            },
+            "command": "west",
+            "args": [
+                "build",
+                "-p",
+                "${input:pristine}",
+                "-b",
+                "${input:board}",
+                "app/",
+                "-d",
+                "build-slot0",
+                "--",
+                "-DZEPHYR_SCA_VARIANT=codechecker"
+            ],
+            "problemMatcher": [
+                "$gcc"
+            ]
+        },
+        {
+            "label": "Start CodeChecker Server",
+            "type": "shell",
+            "group": {
+                "kind": "none"
+            },
+            "command": "CodeChecker",
+            "args": [
+                "server",
+                "--workspace",
+                "./ws",
+                "--port",
+                "8666"
+            ],
+            "problemMatcher": []
+        },
+        {
+            "label": "Store CodeChecker files on CodeChecker Server",
+            "type": "shell",
+            "group": {
+                "kind": "none"
+            },
+            "command": "CodeChecker",
+            "args": [
+                "store",
+                "./build-slot0/sca/codechecker/codechecker.plist",
+                "--name",
+                "app",
+                "--url",
+                "http://127.0.0.1:8666/Default"
+            ],
+            "problemMatcher": []
+        },
+        {
+            "label": "West Build MCUBoot Bootloader",
+            "type": "shell",
+            "group": {
+                "kind": "build",
+            },
+            "command": "west",
+            "args": [
+                "build",
+                "-p",
+                "always",
+                "-b",
+                "nucleo_f401re",
+                "deps/bootloader/mcuboot/boot/zephyr/",
+                "-d",
+                "build-mcuboot",
+                "-DDTC_OVERLAY_FILE=\"/workspace/app/boards/bootloader_nucleo_f401re.overlay\""
+            ],
+            "problemMatcher": [
+                "$gcc"
+            ],
+        },
+        {
+            "label": "West Build Slot1",
+            "type": "shell",
+            "group": {
+                "kind": "build",
+            },
+            "command": "west",
+            "args": [
+                "build",
+                "-p",
+                "always",
+                "-b",
+                "nucleo_f401re",
+                "app/",
+                "-d",
+                "build-slot1"
+            ],
+            "problemMatcher": [
+                "$gcc"
+            ],
+        },
+        {
+            "label": "West Update",
+            "type": "shell",
+            "group": {
+                "kind": "none",
+            },
+            "command": "west",
+            "args": [
+                "update"
+            ],
+            "problemMatcher": []
+        }
+    ],
+    "inputs": [
+        {
+            "id": "board",
+            "type": "promptString",
+            "default": "nucleo_f401re",
+            "description": "See https://docs.zephyrproject.org/latest/boards/index.html"
+        },
+        {
+            "id": "pristine",
+            "type": "pickString",
+            "description": "Choose when to run a pristine build",
+            "default": "auto",
+            "options": [
+                "auto",
+                "always",
+                "never"
+            ]
+        }
+    ]
 }
