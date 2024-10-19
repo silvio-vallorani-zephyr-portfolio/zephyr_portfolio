@@ -1,5 +1,9 @@
+// WINDOWS COMMAND
 // & 'C:\Program Files\SEGGER\JLink\JLink.exe' -CommandFile prog_erase_stm32f401re.jlink
-// \opt\SEGGER\JLink\JLinkExe -CommandFile prog_erase_stm32f401re.jlink
+
+// LINUX COMMAND
+// /opt/SEGGER/JLink/JLinkExe -CommandFile prog_erase_stm32f401re.jlink
+
 si swd
 speed 1000
 device STM32F401RE
