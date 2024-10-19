@@ -17,6 +17,7 @@
 		temp-hum-sensor = &temp_hum_sensor;
 		dbg-pin0 = &dbg_pin0;
 		dbg-pin1 = &dbg_pin1;
+		watchdog = &iwdg;
 	};
 
 	sram@20017C00 {
@@ -140,4 +141,12 @@
 				 LED_COLOR_ID_RED
 				 LED_COLOR_ID_BLUE>;
 	};
+};
+
+&wwdg {
+	status = "disabled";
+};
+
+&iwdg {
+	status = "okay";
 };
