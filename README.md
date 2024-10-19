@@ -36,13 +36,13 @@ Some functions involve the use of Segger Jlink. All of them can be used with JLi
 - [x] Use the Core Dump subsystem to dump the application memory on fatal error (refer [here](https://blog.espressif.com/core-dump-a-powerful-tool-for-debugging-programs-in-zephyr-with-esp32-boards-969830fd6cdb) for backtracing the dump )
 - [x] Use the Retention System to guarantee some ram-stored info to be valid after reset
 - [x] Use the Hardware Info System to get some info about the board e.g. reset cause
+- [x] Use Task Watchdog subsystem to supervise the application
 - [ ] Use the Twister subsystem to write some unit tests and run them (try to develop in TDD way)
-- [ ] Use Task Watchdog subsystem to supervise the application
 - [ ] Use the State Machine Framework to define a simple state machine
 - [ ] Use user space / privileged mode to keep memory areas more safe
 - [ ] Use Trusted Firmware-M to manage the project life in a secure context
 
 - [ ] Change default partition slots to be used as custom static MCUBoot partition layout
 - [ ] Code a custom driver for a device (e.g. an i2c device)
-- [ ] Define a totally custom board and use it to test all the listed feature: shold be done without refactoring the application code at all
+- [ ] Define a totally custom board and use it to test all the listed feature: should be done without refactoring the application code at all
 - [ ] Use the Zephyr shell to interact with the application

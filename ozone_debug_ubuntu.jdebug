@@ -22,7 +22,7 @@ void OnProjectLoad (void) {
   //
   // Dialog-generated settings
   //
-  Project.AddPathSubstitute ("~/Projects/zephyr_devcontainer", "$(ProjectDir)");
+  Project.AddPathSubstitute ("~/ZephProjects/zephyr_portfolio", "$(ProjectDir)");
   Project.AddPathSubstitute ("/workspace/app", "$(ProjectDir)");
   Project.AddPathSubstitute ("/workspace/build-slot0", "$(ProjectDir)/build-slot0");
   Project.AddPathSubstitute ("/workspace/deps", "/var/lib/docker/volumes/zephyr-deps/_data");
@@ -37,7 +37,7 @@ void OnProjectLoad (void) {
   //
   // User settings
   //
-  File.Open ("$(ProjectDir)/build/zephyr/zephyr.elf");
+  File.Open ("$(ProjectDir)/build-slot0/zephyr/zephyr.elf");
 }
 
 /*********************************************************************

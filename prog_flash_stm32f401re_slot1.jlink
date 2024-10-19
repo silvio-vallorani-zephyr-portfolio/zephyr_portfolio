@@ -1,5 +1,9 @@
+// WINDOWS COMMAND
 // & 'C:\Program Files\SEGGER\JLink\JLink.exe' -CommandFile prog_flash_stm32f401re_slot1.jlink
-// \opt\SEGGER\JLink\JLinkExe -CommandFile prog_flash_stm32f401re_slot1.jlink
+
+// LINUX COMMAND
+// /opt/SEGGER/JLink/JLinkExe -CommandFile prog_flash_stm32f401re_slot1.jlink
+
 si swd
 speed 1000
 device STM32F401RE
@@ -7,6 +11,12 @@ device STM32F401RE
 sleep 250
 r
 h
-loadfile build-slot1\zephyr\zephyr.signed.confirmed.bin 0x08040000 reset
+
+// WINDOWS
+//loadfile build-slot1\zephyr\zephyr.signed.confirmed.bin 0x08040000 reset
+
+// LINUX
+loadfile build-slot1/zephyr/zephyr.signed.confirmed.bin 0x08040000 reset
+
 g
 exit

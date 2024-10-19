@@ -22,8 +22,8 @@ void OnProjectLoad (void) {
   //
   // Dialog-generated settings
   //
-  Project.AddPathSubstitute ("E:/TEST/ZEPHYR_DOCKER/ZEPHYR_DEVCONTAINER", "$(ProjectDir)");
-  Project.AddPathSubstitute ("e:/test/zephyr_docker/zephyr_devcontainer", "$(ProjectDir)");
+  Project.AddPathSubstitute ("E:/TEST/ZEPHYR_DOCKER/ZEPHYR_PORTFOLIO", "$(ProjectDir)");
+  Project.AddPathSubstitute ("e:/test/zephyr_docker/zephyr_portfolio", "$(ProjectDir)");
   Project.AddPathSubstitute ("/workspace/app", "$(ProjectDir)");
   Project.AddPathSubstitute ("/workspace/build-slot0", "$(ProjectDir)/build-slot0");
   Project.AddPathSubstitute ("/workspace/deps", "//wsl.localhost/docker-desktop/mnt/docker-desktop-disk/data/docker/volumes/zephyr-deps/_data");

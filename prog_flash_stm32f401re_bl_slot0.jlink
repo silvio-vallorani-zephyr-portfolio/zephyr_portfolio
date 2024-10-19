@@ -1,5 +1,9 @@
+// WINDOWS COMMAND
 // & 'C:\Program Files\SEGGER\JLink\JLink.exe' -CommandFile prog_flash_stm32f401re_bl_slot0.jlink
-// \opt\SEGGER\JLink\JLinkExe -CommandFile prog_flash_stm32f401re_bl_slot0.jlink
+
+// LINUX COMMAND
+// /opt/SEGGER/JLink/JLinkExe -CommandFile prog_flash_stm32f401re_bl_slot0.jlink
+
 si swd
 speed 1000
 device STM32F401RE
@@ -10,7 +14,14 @@ erase
 sleep 250
 r
 h
-loadfile build-mcuboot\zephyr\zephyr.bin 0x08000000 noreset
-loadfile build-slot0\zephyr\zephyr.signed.confirmed.bin 0x08020000 reset
+
+// WINDOWS
+//loadfile build-mcuboot\zephyr\zephyr.bin 0x08000000 noreset
+//loadfile build-slot0\zephyr\zephyr.signed.confirmed.bin 0x08020000 reset
+
+// LINUX
+loadfile build-mcuboot/zephyr/zephyr.bin 0x08000000 noreset
+loadfile build-slot0/zephyr/zephyr.signed.confirmed.bin 0x08020000 reset
+
 g
 exit

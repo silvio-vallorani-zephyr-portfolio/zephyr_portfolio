@@ -7,21 +7,30 @@
 #include <SEGGER_RTT.h>
 #include <SEGGER_RTT_Conf.h>
 #include <errno.h>
+#include <stdbool.h>
 #include <stdio.h>
 #include <string.h>
+#include <zephyr/kernel.h>
 #include <zephyr/device.h>
 #include <zephyr/devicetree.h>
+#include <zephyr/drivers/watchdog.h>
 #include <zephyr/drivers/gpio.h>
 #include <zephyr/drivers/hwinfo.h>
 #include <zephyr/drivers/led_strip.h>
 #include <zephyr/drivers/sensor.h>
 #include <zephyr/drivers/spi.h>
-#include <zephyr/kernel.h>
 #include <zephyr/retention/retention.h>
 #include <zephyr/settings/settings.h>
+#include <zephyr/sys/reboot.h>
 #include <zephyr/sys/printk.h>
 #include <zephyr/sys/util.h>
+#include <zephyr/task_wdt/task_wdt.h>
 #include <zephyr/zbus/zbus.h>
+
+// TASK WATCHDOG SUBSYSTEM DEFINITIONS
+//#define FORCE_TEST_TASK_WATCHDOG // Uncomment to test the task watchdog
+static const struct device *const hw_wdt_dev = DEVICE_DT_GET(DT_ALIAS(watchdog));
+static void task_wdt_callback(int channel_id, void *user_data);
 
 // RETENTION SYSTEM DEFINITIONS
 static const struct device *retention_data = DEVICE_DT_GET(DT_ALIAS(retention_data));
@@ -227,9 +236,12 @@ void thread_sensor_loop(const char *my_name) {
     struct sensor_value temperature;
     struct sensor_value humidity;
     struct th_msg th;
+    int task_wdt_id = task_wdt_add(2*THREAD_SENSOR_SLEEPTIME, task_wdt_callback, (void *)k_current_get());
     __unused int ret;
 
     while (1) {
+        // Feed the task watchdog
+        task_wdt_feed(task_wdt_id);
         current_thread = k_current_get();
         tname = k_thread_name_get((k_tid_t)current_thread);
         if (tname != NULL) {
@@ -267,16 +279,24 @@ void thread_stripled_loop(const char *my_name) {
     const struct k_thread *current_thread;
     const struct zbus_channel *chan;
     AMBIENT_STATE ambient_state;
+    int task_wdt_id = task_wdt_add(2*THREAD_STRIPLED_SLEEPTIME, task_wdt_callback, (void *)k_current_get());
     __unused int ret;
-
     while (1) {
+#ifdef FORCE_TEST_TASK_WATCHDOG
+        static int count = 0;
+        if (count++ == 10) {
+            k_sleep(K_FOREVER);
+        }
+#endif
+        // Feed the task watchdog
+        task_wdt_feed(task_wdt_id);
         current_thread = k_current_get();
         tname = k_thread_name_get((k_tid_t)current_thread);
         if (tname != NULL) {
             struct th_msg th;
             if (!zbus_sub_wait(&th_subscriber, &chan, K_NO_WAIT)) {
                 if (&th_chan == chan) {
-                    zbus_chan_read(&th_chan, &th, K_MSEC(500));
+                    zbus_chan_read(&th_chan, &th, K_MSEC(THREAD_STRIPLED_SLEEPTIME));
                     RTT_CUSTOM_PRINT("From subscriber -> Temperature=%d, Humidity=%d\n", th.temperature, th.humidity);
                 }
             }
@@ -288,7 +308,7 @@ void thread_stripled_loop(const char *my_name) {
         } else {
             k_cpu_idle();
         }
-        k_msleep(THREAD_SENSOR_SLEEPTIME);
+        k_msleep(THREAD_STRIPLED_SLEEPTIME);
     }
     ARG_UNUSED(my_name);
 }
@@ -324,6 +344,11 @@ int main(void) {
     __unused int ret;
     __unused ssize_t len;
     int rstCause, rstCount, rstCountReload;
+
+    // Setup HARDWARE WATCHDOG
+    ret = device_is_ready(hw_wdt_dev);
+    ret = task_wdt_init(hw_wdt_dev);
+    int task_wdt_id = task_wdt_add(2*THREAD_MAIN_SLEEPTIME, NULL, NULL);
 
     // Setup Retention Subsystem
     ret = device_is_ready(retention_data);
@@ -373,6 +398,8 @@ int main(void) {
     memcpy(ambient_rgb_table, default_ambient_rgb_table, sizeof(ambient_rgb_table));
 
     while (1) {
+        // Feed the task watchdog
+        task_wdt_feed(task_wdt_id);
         // Toggle debug pins just to see if the board is working
         ret = gpio_pin_toggle_dt(&dbg_pin0);
         ret = gpio_pin_toggle_dt(&dbg_pin1);
@@ -398,4 +425,14 @@ int main(void) {
         }
     }
     return 0;
+}
+
+//////////////////////////////////////////////////////////////////////////////////////////
+//  TASK WATCHDOG IMPLEMENTATION
+//////////////////////////////////////////////////////////////////////////////////////////
+static void task_wdt_callback(int channel_id, void *user_data)
+{
+    RTT_CUSTOM_PRINT("Task watchdog channel %d callback, thread: %s\n", channel_id, k_thread_name_get((k_tid_t)user_data));
+    RTT_CUSTOM_PRINT("Resetting device...\n");
+    sys_reboot(SYS_REBOOT_WARM);
 }
