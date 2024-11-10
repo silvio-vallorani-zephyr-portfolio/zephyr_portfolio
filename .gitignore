@@ -60,6 +60,8 @@ build-mcuboot/*
 !build-mcuboot/dummy
 build-slot1/*
 !build-slot1/dummy
+build-test/*
+!build-test/dummy
 .vscode/*
 !.vscode/tasks.json
 

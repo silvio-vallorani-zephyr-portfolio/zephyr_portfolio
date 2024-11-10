@@ -167,6 +167,30 @@
             ],
         },
         {
+            "label": "Build Test",
+            "type": "shell",
+            "group": {
+                "kind": "build",
+            },
+            "command": "west",
+            "args": [
+                "build",
+                "-p",
+                "auto",
+                "-b",
+                "nucleo_f401re",
+                "app/",
+                "-d",
+                "build-test",
+                "--",
+                "-DTESTS=ON",
+                "-DEXTRA_CONF_FILE=test.conf"
+            ],
+            "problemMatcher": [
+                "$gcc"
+            ]
+        },
+        {
             "label": "West Update",
             "type": "shell",
             "group": {

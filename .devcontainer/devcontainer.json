@@ -13,7 +13,8 @@
     "source=zephyr-deps,target=/workspace/deps,type=volume,consistency=delegated",
     "source=${localWorkspaceFolder}/build-mcuboot/,target=/workspace/build-mcuboot,type=bind,consistency=delegated",
     "source=${localWorkspaceFolder}/build-slot0/,target=/workspace/build-slot0,type=bind,consistency=delegated",
-    "source=${localWorkspaceFolder}/build-slot1/,target=/workspace/build-slot1,type=bind,consistency=delegated"
+    "source=${localWorkspaceFolder}/build-slot1/,target=/workspace/build-slot1,type=bind,consistency=delegated",
+    "source=${localWorkspaceFolder}/build-test/,target=/workspace/build-test,type=bind,consistency=delegated"
   ],
   "customizations": {
     "vscode": {
