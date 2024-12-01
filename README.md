@@ -1,6 +1,6 @@
 # Zephyr development environment to train myself
 
-This repo contains a VSCode [DevContainer](.devcontainer/devcontainer.json) that uses the Docker Container defined in [zephyr_container](https://github.com/silvio-vallorani/zephyr_container).
+This repo contains a VSCode [DevContainer](.devcontainer/devcontainer.json) that uses the Docker Container defined in [zephyr_container](https://github.com/silvio-vallorani-zephyr-portfolio/zephyr_container).
 
 When the DevContainer starts, it create a Zephyr Project with only the modules listed in the [west](west.yml) file.
 
