@@ -26,6 +26,7 @@
 #include <zephyr/sys/util.h>
 #include <zephyr/task_wdt/task_wdt.h>
 #include <zephyr/zbus/zbus.h>
+#include "tl_smf.h"
 
 // TASK WATCHDOG SUBSYSTEM DEFINITIONS
 //#define FORCE_TEST_TASK_WATCHDOG // Uncomment to test the task watchdog
@@ -202,8 +203,10 @@ int settings_handle_get(const char *key, char *val, int val_len_max) {
 //////////////////////////////////////////////////////////////////////////////////////////
 //  BUTTON PRESSED IMPLEMENTATION
 //////////////////////////////////////////////////////////////////////////////////////////
+extern struct s_object tl_s_obj;
 void button_pressed(const struct device *dev, struct gpio_callback *cb, uint32_t pins) {
     k_msgq_put(&button_action_msgq, &pins, K_NO_WAIT);
+    k_event_post(&tl_s_obj.smf_event, TL_EVENT_BTN_PRESS);
     ARG_UNUSED(dev);
     ARG_UNUSED(cb);
 }

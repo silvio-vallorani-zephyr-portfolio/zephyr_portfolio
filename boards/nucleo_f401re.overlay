@@ -18,6 +18,9 @@
 		dbg-pin0 = &dbg_pin0;
 		dbg-pin1 = &dbg_pin1;
 		watchdog = &iwdg;
+		tl-red = &tl_red;
+		tl-orange = &tl_orange;
+		tl-green = &tl_green;
 	};
 
 	sram@20017C00 {
@@ -45,12 +48,28 @@
 	dbg_pins: dbg_pins {
 		compatible = "debug-pins";
 		dbg_pin0: dbg_pin_0 {
-			gpios = <&gpioc 10 GPIO_ACTIVE_HIGH>;
+			gpios = <&gpioc 6 GPIO_ACTIVE_HIGH>;
 			label = "Debug PIn 0";
 		};
 		dbg_pin1: dbg_pin_1 {
-			gpios = <&gpioc 11 GPIO_ACTIVE_HIGH>;
+			gpios = <&gpioc 8 GPIO_ACTIVE_HIGH>;
 			label = "Debug PIn 1";
+		};
+	};
+
+	tl_pins: tl_pins {
+		compatible = "trafficlight-pins";
+		tl_red: tl_red0 {
+			gpios = <&gpioc 10 GPIO_ACTIVE_HIGH>;
+			label = "Trafficlight Red";
+		};
+		tl_orange: tl_orange0 {
+			gpios = <&gpioc 11 GPIO_ACTIVE_HIGH>;
+			label = "Trafficlight Orange";
+		};
+		tl_green: tl_green0 {
+			gpios = <&gpiod 2 GPIO_ACTIVE_HIGH>;
+			label = "Trafficlight Green";
 		};
 	};
 
