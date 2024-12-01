@@ -1,0 +1,13 @@
+description: GPIO pin for Trafficlight
+compatible: "trafficlight-pins"
+
+child-binding:
+  description: The GPIO used for the trafficlight.
+  properties:
+    gpios:
+      type: phandle-array
+      required: true
+    label:
+      type: string
+      description: |
+        The GPIO used for the trafficlight.
