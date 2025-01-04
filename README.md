@@ -39,7 +39,7 @@ Some functions involve the use of Segger Jlink. All of them can be used with JLi
 - [x] Use Task Watchdog subsystem to supervise the application
 - [x] Use the Twister subsystem to write some unit tests and run them (try to develop in TDD way)
 - [x] Use the State Machine Framework to define a simple state machine
-- [ ] Use user space / privileged mode to keep memory areas more safe
+- [x] Use user space / privileged mode to keep memory areas more safe
 - [ ] Use Trusted Firmware-M to manage the project life in a secure context
 
 - [ ] Change default partition slots to be used as custom static MCUBoot partition layout

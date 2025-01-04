@@ -1,5 +1,11 @@
+/*
+ * Copyright (c) 2024-2025 Silvio Vallorani
+ *
+ * SPDX-License-Identifier: Apache-2.0
+ */
+
 #ifndef TL_SMF_H_
-#define TL_SMF_H_
+#define TL_SMF_H_ 1
 
 #include <zephyr/kernel.h>
 #include <zephyr/smf.h>
@@ -16,5 +22,8 @@ struct s_object {
     struct k_event smf_event;
     int32_t events;
 };
+
+struct s_object* s_object_get_reference(void);
+struct k_event* s_object_get_event_listener(struct s_object *self);
 
 #endif /* TL_SMF_H_ */

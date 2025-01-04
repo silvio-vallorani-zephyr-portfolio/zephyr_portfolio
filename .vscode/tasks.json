@@ -11,6 +11,7 @@
             "command": "west",
             "args": [
                 "build",
+                "-o=-j4",
                 "-p",
                 "auto",
                 "-b",
@@ -32,6 +33,7 @@
             "command": "west",
             "args": [
                 "build",
+                "-o=-j4",
                 "-p",
                 "${input:pristine}",
                 "-b",
@@ -53,6 +55,7 @@
             "command": "west",
             "args": [
                 "build",
+                "-o=-j4",
                 "-p",
                 "auto",
                 "-b",
@@ -76,6 +79,7 @@
             "command": "west",
             "args": [
                 "build",
+                "-o=-j4",
                 "-p",
                 "${input:pristine}",
                 "-b",
@@ -132,6 +136,7 @@
             "command": "west",
             "args": [
                 "build",
+                "-o=-j4",
                 "-p",
                 "always",
                 "-b",
@@ -154,6 +159,7 @@
             "command": "west",
             "args": [
                 "build",
+                "-o=-j4",
                 "-p",
                 "always",
                 "-b",
@@ -175,6 +181,7 @@
             "command": "west",
             "args": [
                 "build",
+                "-o=-j4",
                 "-p",
                 "auto",
                 "-b",

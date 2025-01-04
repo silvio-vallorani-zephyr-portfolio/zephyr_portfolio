@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2012-2014 Wind River Systems, Inc.
+ * Copyright (c) 2024-2025 Silvio Vallorani
  *
  * SPDX-License-Identifier: Apache-2.0
  */
@@ -26,7 +26,9 @@
 #include <zephyr/sys/util.h>
 #include <zephyr/task_wdt/task_wdt.h>
 #include <zephyr/zbus/zbus.h>
+#include <zephyr/sys/libc-hooks.h>
 #include "tl_smf.h"
+#include "usr_thread.h"
 
 // TASK WATCHDOG SUBSYSTEM DEFINITIONS
 //#define FORCE_TEST_TASK_WATCHDOG // Uncomment to test the task watchdog
@@ -38,7 +40,6 @@ static const struct device *retention_data = DEVICE_DT_GET(DT_ALIAS(retention_da
 
 // DEBUG PINS DEFINITIONS
 static const struct gpio_dt_spec dbg_pin0 = GPIO_DT_SPEC_GET(DT_ALIAS(dbg_pin0), gpios);
-static const struct gpio_dt_spec dbg_pin1 = GPIO_DT_SPEC_GET(DT_ALIAS(dbg_pin1), gpios);
 
 // ONBOARD LED DEFINITIONS
 static const struct gpio_dt_spec led = GPIO_DT_SPEC_GET(DT_ALIAS(led0), gpios);
@@ -203,10 +204,9 @@ int settings_handle_get(const char *key, char *val, int val_len_max) {
 //////////////////////////////////////////////////////////////////////////////////////////
 //  BUTTON PRESSED IMPLEMENTATION
 //////////////////////////////////////////////////////////////////////////////////////////
-extern struct s_object tl_s_obj;
 void button_pressed(const struct device *dev, struct gpio_callback *cb, uint32_t pins) {
     k_msgq_put(&button_action_msgq, &pins, K_NO_WAIT);
-    k_event_post(&tl_s_obj.smf_event, TL_EVENT_BTN_PRESS);
+    k_event_post(s_object_get_event_listener(s_object_get_reference()), TL_EVENT_BTN_PRESS);
     ARG_UNUSED(dev);
     ARG_UNUSED(cb);
 }
@@ -383,8 +383,6 @@ int main(void) {
     // Setup debug pins
     ret = gpio_is_ready_dt(&dbg_pin0);
     ret = gpio_pin_configure_dt(&dbg_pin0, GPIO_OUTPUT_ACTIVE);
-    ret = gpio_is_ready_dt(&dbg_pin1);
-    ret = gpio_pin_configure_dt(&dbg_pin1, GPIO_OUTPUT_ACTIVE);
 
     // Setup Settings Subsystem
     ret = settings_subsys_init();
@@ -400,12 +398,14 @@ int main(void) {
     // Setup actual colors map in default values
     memcpy(ambient_rgb_table, default_ambient_rgb_table, sizeof(ambient_rgb_table));
 
+    // Init the User
+    thread_userspace_init();
+
     while (1) {
         // Feed the task watchdog
         task_wdt_feed(task_wdt_id);
         // Toggle debug pins just to see if the board is working
         ret = gpio_pin_toggle_dt(&dbg_pin0);
-        ret = gpio_pin_toggle_dt(&dbg_pin1);
 
         k_msleep(THREAD_MAIN_SLEEPTIME);
 

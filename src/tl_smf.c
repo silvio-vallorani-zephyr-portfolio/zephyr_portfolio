@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2012-2014 Wind River Systems, Inc.
+ * Copyright (c) 2024-2025 Silvio Vallorani
  *
  * SPDX-License-Identifier: Apache-2.0
  */
@@ -23,20 +23,24 @@
 #define TF_LIGHT_OFF 1
 
 // TRAFFICLIGHT PINS DEFINITIONS
-static const struct gpio_dt_spec tl_red = GPIO_DT_SPEC_GET(DT_ALIAS(tl_red), gpios);
-static const struct gpio_dt_spec tl_orange = GPIO_DT_SPEC_GET(DT_ALIAS(tl_orange), gpios);
-static const struct gpio_dt_spec tl_green = GPIO_DT_SPEC_GET(DT_ALIAS(tl_green), gpios);
+const struct gpio_dt_spec tl_red = GPIO_DT_SPEC_GET(DT_ALIAS(tl_red), gpios);
+const struct gpio_dt_spec tl_orange = GPIO_DT_SPEC_GET(DT_ALIAS(tl_orange), gpios);
+const struct gpio_dt_spec tl_green = GPIO_DT_SPEC_GET(DT_ALIAS(tl_green), gpios);
 
 // THREAD TRAFFICLIGHT DEFINITIONS
 #define THREAD_TRAFFICLIGHT_SLEEPTIME 500
 #define THREAD_TRAFFICLIGHT_STACKSIZE 2048
 #define THREAD_TRAFFICLIGHT_PRIORITY 7
+#define THREAD_TRAFFICLIGHT_OPTIONS 0 //K_USER
+#define THREAD_TRAFFICLIGHT_DEALAIED_STARTUP_MS 2000
 void thread_trafficlight_entry_point(void *dummy1, void *dummy2, void *dummy3);
 void thread_trafficlight_loop(const char *my_name);
 K_THREAD_DEFINE(thread_trafficlight, 
                 THREAD_TRAFFICLIGHT_STACKSIZE, 
-                thread_trafficlight_entry_point, NULL, NULL, NULL,
-                THREAD_TRAFFICLIGHT_PRIORITY, 0, 0);
+                thread_trafficlight_entry_point, NULL, NULL, NULL, 
+                THREAD_TRAFFICLIGHT_PRIORITY, 
+                THREAD_TRAFFICLIGHT_OPTIONS, 
+                THREAD_TRAFFICLIGHT_DEALAIED_STARTUP_MS);
 
 void tf_timer_handler(struct k_timer *dummy);
 void tl_timeout_work_handler(struct k_work *work);
@@ -51,6 +55,17 @@ enum tl_state { SERVICE, STOP, WARNING, GO };
 
 /* User defined object */
 struct s_object tl_s_obj;
+
+struct s_object* s_object_get_reference(void)
+{
+    return &tl_s_obj;
+}
+/* Event listner getter */
+struct k_event* s_object_get_event_listener(struct s_object *self)
+{
+    return &self->smf_event;
+}
+
 /* State SERVICE */
 static void service_entry(void *o) {
     /* Turn off all lights */
@@ -157,7 +172,6 @@ void tl_timeout_work_handler(struct k_work *work)
     k_event_post(&tl_s_obj.smf_event, TL_EVENT_TIMEOUT);
 }
 
-
 //////////////////////////////////////////////////////////////////////////////////////////
 //  THREAD TRAFFICLIGHT IMPLEMENTATION
 //////////////////////////////////////////////////////////////////////////////////////////
@@ -180,7 +194,8 @@ void thread_trafficlight_entry_point(void *dummy1, void *dummy2, void *dummy3) {
 
 void tl_wdt_callback (int channel_id, void *user_data);
 void thread_trafficlight_loop(const char *my_name) {
-    __unused volatile int ret;
+    volatile int ret;
+    ret = 0;
     int task_wdt_id = task_wdt_add(2*THREAD_TRAFFICLIGHT_SLEEPTIME, tl_wdt_callback, (void *)k_current_get());
     while (1) {
         // Feed the task watchdog

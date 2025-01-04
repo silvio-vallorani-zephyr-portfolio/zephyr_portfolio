@@ -22,10 +22,11 @@ void OnProjectLoad (void) {
   //
   // Dialog-generated settings
   //
-  Project.AddPathSubstitute ("~/ZephProjects/zephyr_portfolio", "$(ProjectDir)");
+  Project.AddPathSubstitute ("~/Projects/Zephyr/zephyr_portfolio", "$(ProjectDir)");
   Project.AddPathSubstitute ("/workspace/app", "$(ProjectDir)");
   Project.AddPathSubstitute ("/workspace/build-slot0", "$(ProjectDir)/build-slot0");
-  Project.AddPathSubstitute ("/workspace/deps", "/var/lib/docker/volumes/zephyr-deps/_data");
+  //Project.AddPathSubstitute ("/workspace/deps", "/var/lib/docker/volumes/zephyr-deps/_data");
+  Project.AddPathSubstitute ("/workspace/deps", "$(ProjectDir)/../deps");
   Project.AddPathSubstitute ("/opt/toolchains", "/var/lib/docker/volumes/zephyr-toolchains/_data");
   Project.SetDevice ("STM32F401RE");
   Project.SetHostIF ("USB", "773292973");
