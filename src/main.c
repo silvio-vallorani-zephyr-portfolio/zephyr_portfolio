@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2012-2014 Wind River Systems, Inc.
+ * Copyright (c) 2024-2025 Silvio Vallorani
  *
  * SPDX-License-Identifier: Apache-2.0
  */
@@ -203,10 +203,9 @@ int settings_handle_get(const char *key, char *val, int val_len_max) {
 //////////////////////////////////////////////////////////////////////////////////////////
 //  BUTTON PRESSED IMPLEMENTATION
 //////////////////////////////////////////////////////////////////////////////////////////
-extern struct s_object tl_s_obj;
 void button_pressed(const struct device *dev, struct gpio_callback *cb, uint32_t pins) {
     k_msgq_put(&button_action_msgq, &pins, K_NO_WAIT);
-    k_event_post(&tl_s_obj.smf_event, TL_EVENT_BTN_PRESS);
+    k_event_post(s_object_get_event_listener(s_object_get_reference()), TL_EVENT_BTN_PRESS);
     ARG_UNUSED(dev);
     ARG_UNUSED(cb);
 }
